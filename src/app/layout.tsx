@@ -1,7 +1,10 @@
+"use client";
 import type React from "react";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { Suspense } from "react";
+import { store } from "@/store/store";
+import { Provider } from "react-redux";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -10,7 +13,7 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "CFA FRM Jobs - Finance Career Platform",
   description:
     "A platform for finance professionals (CFA, FRM, CA, MBA) to find opportunities and build community",
@@ -24,9 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${montserrat.variable} antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
-      </body>
+      <Provider store={store}>
+        <body className={`font-sans ${montserrat.variable} antialiased`}>
+          <Suspense fallback={null}>{children}</Suspense>
+        </body>
+      </Provider>
     </html>
   );
 }
