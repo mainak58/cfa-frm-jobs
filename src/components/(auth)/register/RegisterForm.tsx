@@ -2,6 +2,9 @@
 import React, { useState, useTransition } from "react";
 import { registerAction, RegisterResponse } from "./action";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { countries } from "../../../../country";
+import PhoneInput from "@/components/PhoneInput";
 
 export type showPasswordType = {
   showPassword: boolean;
@@ -9,9 +12,11 @@ export type showPasswordType = {
 };
 
 function RegisterForm() {
+  const disaptch = useDispatch();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const [maxLength, setMaxLength] = React.useState(0);
   const [showPassword, setShowPassword] = useState<showPasswordType>({
     showPassword: false,
     showReenteredPassword: false,
@@ -63,11 +68,16 @@ function RegisterForm() {
           required
         />
 
+        <PhoneInput
+          countries={countries}
+          onMaxLengthChange={(length) => setMaxLength(length)}
+        />
         <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full p-2 border rounded"
+          type="tel"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          maxLength={maxLength}
+          className="w-full p-2 border rounded mt-2"
           required
         />
 
