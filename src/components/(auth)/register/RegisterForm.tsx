@@ -1,11 +1,26 @@
 "use client";
 import React, { useState, useTransition } from "react";
 import { registerAction, RegisterResponse } from "./action";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { countries } from "../../../../country";
+import PhoneInput from "@/components/PhoneInput";
+
+export type showPasswordType = {
+  showPassword: boolean;
+  showReenteredPassword: boolean;
+};
 
 function RegisterForm() {
+  const disaptch = useDispatch();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const [maxLength, setMaxLength] = React.useState(0);
+  const [showPassword, setShowPassword] = useState<showPasswordType>({
+    showPassword: false,
+    showReenteredPassword: false,
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,6 +31,13 @@ function RegisterForm() {
       setMessage(res.message);
       setSuccess(res.success);
     });
+  };
+
+  const toggleShowPassword = (field: keyof showPasswordType) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   return (
@@ -46,29 +68,52 @@ function RegisterForm() {
           required
         />
 
+        <PhoneInput
+          countries={countries}
+          onMaxLengthChange={(length) => setMaxLength(length)}
+        />
         <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full p-2 border rounded"
+          type="tel"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          maxLength={maxLength}
+          className="w-full p-2 border rounded mt-2"
           required
         />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="w-full p-2 border rounded"
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword.showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            className="w-full p-2 border rounded pr-10"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => toggleShowPassword("showPassword")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600"
+          >
+            {showPassword.showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
 
-        <input
-          type="password"
-          name="reEnterPassword"
-          placeholder="Re-enter Password"
-          className="w-full p-2 border rounded"
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword.showReenteredPassword ? "text" : "password"}
+            name="reEnterPassword"
+            placeholder="Re-enter Password"
+            className="w-full p-2 border rounded pr-10"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => toggleShowPassword("showReenteredPassword")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600"
+          >
+            {showPassword.showReenteredPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
 
         <button
           type="submit"
