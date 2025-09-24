@@ -12,11 +12,12 @@ export type showPasswordType = {
 };
 
 function RegisterForm() {
-  const disaptch = useDispatch();
+  const dispatch = useDispatch();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
-  const [maxLength, setMaxLength] = React.useState(0);
+  const [isWhatsAppDifferent, setIsWhatsAppDifferent] =
+    useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<showPasswordType>({
     showPassword: false,
     showReenteredPassword: false,
@@ -45,6 +46,7 @@ function RegisterForm() {
       <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* First Name */}
         <input
           type="text"
           name="firstName"
@@ -61,25 +63,30 @@ function RegisterForm() {
         />
 
         <input
-          type="tel"
-          name="phoneNumber"
-          placeholder="Phone Number"
+          type="email"
+          name="email"
+          placeholder="Email"
           className="w-full p-2 border rounded"
           required
         />
 
-        <PhoneInput
-          countries={countries}
-          onMaxLengthChange={(length) => setMaxLength(length)}
-        />
-        <input
-          type="tel"
-          name="phoneNumber"
-          placeholder="Phone Number"
-          maxLength={maxLength}
-          className="w-full p-2 border rounded mt-2"
-          required
-        />
+        <PhoneInput countries={countries} name="phoneNumber" />
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isWhatsAppDifferent"
+            checked={isWhatsAppDifferent}
+            onChange={() => setIsWhatsAppDifferent((prev) => !prev)}
+          />
+          <label htmlFor="isWhatsAppDifferent">
+            WhatsApp Number is different from Mobile
+          </label>
+        </div>
+
+        {isWhatsAppDifferent && (
+          <PhoneInput countries={countries} name="whatsappNumber" />
+        )}
 
         <div className="relative">
           <input
@@ -114,7 +121,7 @@ function RegisterForm() {
             {showPassword.showReenteredPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
         </div>
-
+        
         <button
           type="submit"
           disabled={isPending}

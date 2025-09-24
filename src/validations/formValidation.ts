@@ -9,6 +9,8 @@ export function formValidation(
 
   const email = formData.get("email")?.toString().trim() || "";
   const phoneNumber = formData.get("phoneNumber")?.toString().trim() || "";
+  const whatsappNumber =
+    formData.get("whatsappNumber")?.toString().trim() || "";
 
   for (const field of requiredFields) {
     const value = formData.get(field)?.toString().trim() || "";
@@ -24,6 +26,10 @@ export function formValidation(
   // Phone validation
   if (phoneNumber && !phoneValidation(phoneNumber)) {
     messages.push("Please provide a valid phone number.");
+  }
+
+  if (whatsappNumber && !phoneValidation(whatsappNumber)) {
+    messages.push("Please provide a valid whatsappNumber.");
   }
 
   return messages;

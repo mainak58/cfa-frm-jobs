@@ -1,5 +1,5 @@
-// "use server";
-"use client";
+"use server";
+// "use client";
 
 import { formValidation } from "@/validations/formValidation";
 
@@ -13,45 +13,44 @@ export async function registerAction(
 ): Promise<RegisterResponse> {
   const required: string[] = [
     "firstName",
+    "lastName",
     "phoneNumber",
     "email",
     "password",
     "reEnterPassword",
+    "whatsappNumber",
   ];
   const errors = formValidation(formData, required);
 
   if (errors.length > 0) return { success: false, message: errors.join(" ") };
 
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
-  const phoneNumber = formData.get("phoneNumber");
+  const firstName = formData.get("firstName")?.toString() || "";
+  const lastName = formData.get("lastName")?.toString() || "";
+  const phoneNumber = formData.get("phoneNumber")?.toString() || "";
+  const countryCode = formData.get("countryCode")?.toString() || "";
   const email = formData.get("email")?.toString() || "";
   const password = formData.get("password")?.toString() || "";
   const reEnterPassword = formData.get("reEnterPassword")?.toString() || "";
+
+  let whatsappNumber = formData.get("whatsappNumber")?.toString() || "";
+  let whatsappCountryCode =
+    formData.get("whatsappCountryCode")?.toString() || "";
+
+  if (!whatsappNumber) whatsappNumber = phoneNumber;
+  if (!whatsappCountryCode) whatsappCountryCode = countryCode;
 
   if (password !== reEnterPassword)
     return { success: false, message: "Passwords do not match." };
 
   console.log("firstName", firstName);
   console.log("lastName", lastName);
+  console.log("countryCode", countryCode);
   console.log("phoneNumber", phoneNumber);
   console.log("email", email);
   console.log("password", password);
   console.log("reEnterPassword", reEnterPassword);
+  console.log("whatsappNumber", whatsappNumber);
+  console.log("whatsappCountryCode", whatsappCountryCode);
 
-  // const res = await fetch("/api/register", {
-  //   method: "POST",
-  //   body: JSON.stringify({
-  //     firstName,
-  //     lastName,
-  //     phoneNumber,
-  //     email,
-  //     password,
-  //   }),
-  //   headers: { "Content-Type": "application/json" },
-  // });
-
-  // const data = await res.json();
-  // return { success: data.success, message: data.message };
   return { success: true, message: "success" };
 }
