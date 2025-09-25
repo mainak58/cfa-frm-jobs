@@ -1,29 +1,18 @@
-"use server";
-// "use client";
+"use client";
 
+import { nextAppInstance } from "@/utils/axiosInstances";
 import { formValidation } from "@/validations/formValidation";
 
 export type RegisterResponse = {
   success: boolean;
-  message: string;
+  message?: string;
+  otpVerify?: boolean;
+  data?: any;
 };
 
 export async function registerAction(
   formData: FormData
 ): Promise<RegisterResponse> {
-  const required: string[] = [
-    "firstName",
-    "lastName",
-    "phoneNumber",
-    "email",
-    "password",
-    "reEnterPassword",
-    "whatsappNumber",
-  ];
-  const errors = formValidation(formData, required);
-
-  if (errors.length > 0) return { success: false, message: errors.join(" ") };
-
   const firstName = formData.get("firstName")?.toString() || "";
   const lastName = formData.get("lastName")?.toString() || "";
   const phoneNumber = formData.get("phoneNumber")?.toString() || "";
@@ -31,26 +20,79 @@ export async function registerAction(
   const email = formData.get("email")?.toString() || "";
   const password = formData.get("password")?.toString() || "";
   const reEnterPassword = formData.get("reEnterPassword")?.toString() || "";
-
+  const verifyOption = formData.get("verifyOption")?.toString() || "";
   let whatsappNumber = formData.get("whatsappNumber")?.toString() || "";
+  let otp = formData.get("otp")?.toString() || "";
   let whatsappCountryCode =
     formData.get("whatsappCountryCode")?.toString() || "";
 
   if (!whatsappNumber) whatsappNumber = phoneNumber;
   if (!whatsappCountryCode) whatsappCountryCode = countryCode;
 
+  const required: string[] = [
+    "firstName",
+    "lastName",
+    "password",
+    "reEnterPassword",
+  ];
+  const errors = formValidation(formData, required);
+  if (errors.length > 0) return { success: false, message: errors.join(" ") };
+
   if (password !== reEnterPassword)
     return { success: false, message: "Passwords do not match." };
 
-  console.log("firstName", firstName);
-  console.log("lastName", lastName);
-  console.log("countryCode", countryCode);
-  console.log("phoneNumber", phoneNumber);
-  console.log("email", email);
-  console.log("password", password);
-  console.log("reEnterPassword", reEnterPassword);
-  console.log("whatsappNumber", whatsappNumber);
-  console.log("whatsappCountryCode", whatsappCountryCode);
+  const data = {
+    fname: firstName,
+    lname: lastName,
+    password,
+    email,
+    countryCode,
+    phone: phoneNumber,
+    whatsappCountryCode,
+    whatsappNumber,
+    verificationMode: verifyOption,
+    redirectUrl: "/",
+  };
 
-  return { success: true, message: "success" };
+  try {
+    const res = await nextAppInstance.post("/auth/register", data);
+    console.log(res.data.user);
+    console.log(res.data.otp);
+    console.log(res.data.resend_token);
+
+    if (res.status === 200) {
+      const data = {
+        token: res.data.resend_token,
+        otp,
+      };
+
+      const otpVerify = await nextAppInstance.post("/auth/verifytoken", data);
+
+      if (otpVerify.status === 200) {
+        return {
+          success: true,
+          data: res.data,
+          message: "Registration successful",
+          otpVerify: true,
+        };
+      } else {
+        return {
+          success: false,
+          data: res.data,
+          message: "Registration Unsuccessful",
+          otpVerify: false,
+        };
+      }
+    }
+    return {
+      success: true,
+      data: res.data,
+      message: "Registration successful",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Registration failed",
+    };
+  }
 }

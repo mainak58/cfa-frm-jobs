@@ -133,7 +133,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         onChange={handlePhoneChange}
         maxLength={getMaxLength(selectedCountry)}
         className="border rounded p-2 flex-1 min-w-[120px]"
-        required
       />
     </div>
   );

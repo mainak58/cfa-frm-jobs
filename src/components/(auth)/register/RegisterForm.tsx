@@ -16,6 +16,7 @@ function RegisterForm() {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const [verifyOtp, setVerifyOtp] = useState<boolean>(false);
   const [isWhatsAppDifferent, setIsWhatsAppDifferent] =
     useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<showPasswordType>({
@@ -29,8 +30,9 @@ function RegisterForm() {
 
     startTransition(async () => {
       const res: RegisterResponse = await registerAction(formData);
-      setMessage(res.message);
+      setMessage(res.message || "");
       setSuccess(res.success);
+      setVerifyOtp(res.otpVerify || false);
     });
   };
 
@@ -62,16 +64,7 @@ function RegisterForm() {
           className="w-full p-2 border rounded"
         />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full p-2 border rounded"
-          required
-        />
-
         <PhoneInput countries={countries} name="phoneNumber" />
-
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -87,6 +80,13 @@ function RegisterForm() {
         {isWhatsAppDifferent && (
           <PhoneInput countries={countries} name="whatsappNumber" />
         )}
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          className="w-full p-2 border rounded"
+        />
 
         <div className="relative">
           <input
@@ -121,7 +121,29 @@ function RegisterForm() {
             {showPassword.showReenteredPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
         </div>
-        
+
+        <div className="flex gap-5">
+          <div className="flex gap-2">
+            <label htmlFor="verifyByPhone">Phone</label>
+            <input
+              type="radio"
+              name="verifyOption"
+              id="verifyByPhone"
+              value="phone"
+              defaultChecked
+            />
+          </div>
+          <div className="flex gap-2">
+            <label htmlFor="verifyByEmail">Email</label>
+            <input
+              type="radio"
+              name="verifyOption"
+              id="verifyByEmail"
+              value="email"
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={isPending}

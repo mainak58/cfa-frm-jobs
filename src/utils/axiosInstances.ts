@@ -1,9 +1,9 @@
 import axios from "axios";
-import { SELF_URL, SERVER_BASE_URL } from "./config";
+import { DAUTH, SELF_URL, SERVER_BASE_URL } from "./config";
 
 export const nextAppInstance = axios.create({
   withCredentials: true,
-  baseURL: typeof window === "undefined" ? SELF_URL : "/api", 
+  baseURL: typeof window === "undefined" ? SELF_URL : "/api",
 });
 
 export const nodeServerInstance = axios.create({
@@ -11,7 +11,7 @@ export const nodeServerInstance = axios.create({
   baseURL: SERVER_BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    // Dauth: DAUTH,
+    Dauth: DAUTH,
   },
 });
 
