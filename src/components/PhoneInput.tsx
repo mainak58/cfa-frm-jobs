@@ -13,14 +13,18 @@ type Country = {
 
 type PhoneInputProps = {
   countries: Country[];
+  name: string;
   onMaxLengthChange?: (maxLength: number) => void;
 };
 
 const PhoneInput: React.FC<PhoneInputProps> = ({
   countries,
+  name,
   onMaxLengthChange,
 }) => {
-  const [selectedCountry, setSelectedCountry] = useState<Country>(countries[103]);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    countries[103]
+  );
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -55,7 +59,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
       c.phone.includes(search)
   );
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -72,7 +75,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
 
   return (
     <div className="flex gap-2 items-start relative">
-      {/* Country dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
@@ -81,6 +83,13 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         >
           {selectedCountry.phone} ({selectedCountry.code})
         </button>
+
+        {/* Country Code */}
+        <input
+          type="hidden"
+          name={name === "phoneNumber" ? "countryCode" : "whatsappCountryCode"}
+          value={selectedCountry.phone}
+        />
 
         {dropdownOpen && (
           <div className="absolute z-10 mt-1 w-64 bg-white border rounded shadow-lg max-h-60 overflow-y-auto">
@@ -116,7 +125,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
       {/* Phone input */}
       <input
         type="tel"
-        name="phoneNumber"
+        name={name}
         placeholder={`Enter number (max ${getMaxLength(
           selectedCountry
         )} digits)`}
@@ -124,7 +133,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         onChange={handlePhoneChange}
         maxLength={getMaxLength(selectedCountry)}
         className="border rounded p-2 flex-1 min-w-[120px]"
-        required
       />
     </div>
   );

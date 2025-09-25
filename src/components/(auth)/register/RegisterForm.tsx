@@ -12,11 +12,13 @@ export type showPasswordType = {
 };
 
 function RegisterForm() {
-  const disaptch = useDispatch();
+  const dispatch = useDispatch();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
-  const [maxLength, setMaxLength] = React.useState(0);
+  const [verifyOtp, setVerifyOtp] = useState<boolean>(false);
+  const [isWhatsAppDifferent, setIsWhatsAppDifferent] =
+    useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<showPasswordType>({
     showPassword: false,
     showReenteredPassword: false,
@@ -28,8 +30,9 @@ function RegisterForm() {
 
     startTransition(async () => {
       const res: RegisterResponse = await registerAction(formData);
-      setMessage(res.message);
+      setMessage(res.message || "");
       setSuccess(res.success);
+      setVerifyOtp(res.otpVerify || false);
     });
   };
 
@@ -45,6 +48,7 @@ function RegisterForm() {
       <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* First Name */}
         <input
           type="text"
           name="firstName"
@@ -60,25 +64,28 @@ function RegisterForm() {
           className="w-full p-2 border rounded"
         />
 
-        <input
-          type="tel"
-          name="phoneNumber"
-          placeholder="Phone Number"
-          className="w-full p-2 border rounded"
-          required
-        />
+        <PhoneInput countries={countries} name="phoneNumber" />
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isWhatsAppDifferent"
+            checked={isWhatsAppDifferent}
+            onChange={() => setIsWhatsAppDifferent((prev) => !prev)}
+          />
+          <label htmlFor="isWhatsAppDifferent">
+            WhatsApp Number is different from Mobile
+          </label>
+        </div>
 
-        <PhoneInput
-          countries={countries}
-          onMaxLengthChange={(length) => setMaxLength(length)}
-        />
+        {isWhatsAppDifferent && (
+          <PhoneInput countries={countries} name="whatsappNumber" />
+        )}
+
         <input
-          type="tel"
-          name="phoneNumber"
-          placeholder="Phone Number"
-          maxLength={maxLength}
-          className="w-full p-2 border rounded mt-2"
-          required
+          type="email"
+          name="email"
+          placeholder="Email"
+          className="w-full p-2 border rounded"
         />
 
         <div className="relative">
@@ -113,6 +120,28 @@ function RegisterForm() {
           >
             {showPassword.showReenteredPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
+        </div>
+
+        <div className="flex gap-5">
+          <div className="flex gap-2">
+            <label htmlFor="verifyByPhone">Phone</label>
+            <input
+              type="radio"
+              name="verifyOption"
+              id="verifyByPhone"
+              value="phone"
+              defaultChecked
+            />
+          </div>
+          <div className="flex gap-2">
+            <label htmlFor="verifyByEmail">Email</label>
+            <input
+              type="radio"
+              name="verifyOption"
+              id="verifyByEmail"
+              value="email"
+            />
+          </div>
         </div>
 
         <button
